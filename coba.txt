@@ -1,0 +1,25 @@
+// https://baak.gunadarma.ac.id/downloadAkademik/6
+
+
+
+// $data = [
+// 'chat_id' => $chat_id,
+// 'parse_mode' => 'markdown',
+// 'text' => "[​​​​​​​​​​​](https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Stack_Overflow_logo.svg/200px-Stack_Overflow_logo.svg.png) Some text here.",
+// ];
+
+
+
+function KirimPerintahCurl($perintah, $data)
+{
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, BotKirim($perintah));
+  curl_setopt($ch, CURLOPT_POST, count($data));
+  curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+  $kembali = curl_exec($ch);
+  curl_close($ch);
+
+  return $kembali;
+}

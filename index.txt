@@ -1,0 +1,104 @@
+<?php
+
+error_reporting(0);
+
+
+
+function run()
+{
+
+  $TOKEN = "5831470744:AAE5GC1KAxGSp5SjYtXZCvih6L7QxeUWOs0";
+  $apiURL = "https://api.telegram.org/bot$TOKEN";
+  $update = json_decode(file_get_contents("php://input"), TRUE);
+
+
+  $message = $update["message"]["text"]; //tidak perlu di implode
+
+  $username = $update["message"]['chat']["username"];
+
+  $data1 = array(
+    'chat_id' => $update["message"]["chat"]["id"],
+    'text' => "Selamat datang @$username\n" . "Silahkan pilih menu di bawah ini\n" . "Menu\n" . "1. Create \n2. FindById\n3. Update\n4. Delete",
+    'parse_mode' => 'HTML'
+  );
+
+
+
+  $conn = mysqli_connect("localhost", "root", "", "sample");
+  // Check connection
+
+
+  $queries1 = http_build_query($data1);
+
+
+  $str_arr = explode(",", $message);
+
+
+  $jumlah = count($str_arr);
+
+  if (false !== strpos($message, "/start")) {
+
+    file_get_contents($apiURL . "/sendMessage?$queries1 ");
+  }
+  if (false !== strpos($message, '/insert') && $jumlah == 4) {
+
+
+    $nama = $str_arr[1];
+    $umur = $str_arr[2];
+    $alamat = $str_arr[3];
+    $sql = "INSERT INTO mahasiswa (id, nama, umur, alamat)
+    VALUES ('', '$nama','$umur', '$alamat')";
+
+    if (mysqli_query($conn, $sql)) {
+      $data2 = array(
+        'chat_id' => $update["message"]["chat"]["id"],
+        'text' => "Data berhasil disimpan",
+        'parse_mode' => 'HTML'
+      );
+      $queries2 = http_build_query($data2);
+
+      file_get_contents($apiURL . "/sendMessage?$queries2 ");
+      mysqli_close($conn);
+    } else {
+      $data2 = array(
+        'chat_id' => $update["message"]["chat"]["id"],
+        'text' =>  "Data gagal disimpan. Terjadi Kesalahan pada SQL",
+        'parse_mode' => 'HTML'
+      );
+      $queries2 = http_build_query($data2);
+
+      file_get_contents($apiURL . "/sendMessage?$queries2 ");
+    }
+  }
+
+
+
+
+
+  $id = $str_arr[1];
+  if (false !== strpos($message, '/select')) {
+    $sql = "SELECT * FROM mahasiswa WHERE $id";
+
+    if (mysqli_query($conn, $sql)) {
+      $data3 = array(
+        'chat_id' => $update["message"]["chat"]["id"],
+        'text' => "New record created successfully",
+        'parse_mode' => 'HTML'
+      );
+      $queries2 = http_build_query($data2);
+
+      file_get_contents($apiURL . "/sendMessage?$queries2 ");
+    } else {
+      $data3 = array(
+        'chat_id' => $update["message"]["chat"]["id"],
+        'text' => "Gagal",
+        'parse_mode' => 'HTML'
+      );
+      $queries2 = http_build_query($data2);
+
+      file_get_contents($apiURL . "/sendMessage?$queries2 ");
+    }
+  }
+}
+
+run();
