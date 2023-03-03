@@ -45,7 +45,9 @@ if ($pattern == '/start') {
       \n4. Tampil semua data pelanggan = /select-all
       \n5. Cari mahasiswa berdasarkan id = /select,{id}
       \n6. Laporan = /laporan,{nama file tanpa extension}
-      \n6. Jadwal dari BAAK Gunadarma = /scrap-baak
+      \n7. Kalender Akademik Gunadarma = /scrap-baak
+      \n8. Jadwal Perkuliahan Gunadarma = /scrap-jadwal,{kelas atau dosen}
+    
       \nGunakan perintah tanpa tanda kurung kurawal",
     'parse_mode' => 'HTML'
   ));
