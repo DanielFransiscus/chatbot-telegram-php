@@ -1,19 +1,26 @@
 <?php
-define("TOKEN", "");
+define("TOKEN", "5831470744:AAE5GC1KAxGSp5SjYtXZCvih6L7QxeUWOs0");
 
 require_once('tcpdf/tcpdf.php');
 $apiURL = "https://api.telegram.org/bot" . TOKEN;
-$update = json_decode(file_get_contents("php://input"), TRUE);
-$chat_id = $update["message"]["chat"]["id"];
-$message = $update["message"]["text"]; //tidak perlu di implode
-$username = $update["message"]['chat']["username"];
-$update["message"]["chat"]["id"];
-
-$str_arr = explode(",", $message);
-
-$jumlah = count($str_arr);
 
 $conn = mysqli_connect("localhost", "root", "", "sample");
+$update = json_decode(file_get_contents("php://input"), TRUE);
+
+error_reporting(0);
+
+$chat_id = $update["message"]["chat"]["id"];
+
+$username = $update["message"]['chat']["username"];
+$message = $update["message"]["text"];
+$str_arr = explode(",", $message);
+$jumlah = count($str_arr);
+
+
+
+
+
+
 
 function getLink($nama)
 {
@@ -57,48 +64,86 @@ function getLink($nama)
   $html .= '</table>';
   $pdf->writeHTML($html, true, false, false, false, '');
   $pdf->Output(__DIR__  . '/upload/' . $nama . '.pdf', 'F');
-  $link  = "https://7106-180-244-192-216.ap.ngrok.io/telebot/upload/" . $nama . ".pdf";
+  $link  = "https://167c-36-70-176-201.ap.ngrok.io/telebot/upload/" . $nama . ".pdf";
+  //url saat ini
   return $link;
 }
 
 
 
 
-function scrapBAAK()
+function scrap_baak()
 {
   $html = file_get_contents('https://baak.gunadarma.ac.id/');
   preg_match_all('/<table[^>]*class="table table-custom table-primary bordered-table table-striped table-fixed stacktable small-only"[^>]*>(.*?)<\/table>/is', $html, $matches);
-  $table = $matches[1][0];
+  $table = $matches[0][0];
   preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $table, $matches);
-  $rows = $matches[1];
+  $rows = $matches[0];
   $data = [];
   foreach ($rows as $row) {
     preg_match_all('/<td[^>]*>(.*?)<\/td>/is', $row, $cols);
     $rowData = $cols[1];
     $data[] = $rowData;
   }
-  $m = "";
-  foreach ($data as $d) {
-    $m .=  "<b>" . $d['0'] . "</b>" . PHP_EOL;
-    $m .= $d['1'];
-    $m .=  $d['2'];
-    $m .= $d['3'];
-    $m .=  $d['4'];
-    $m .= $d['5'];
-    $m .= $d['6'];
-    $m .= $d['7'];
-    $m .= $d['8'];
-    $m .= $d['9'];
-    $m .= $d['10'];
-    $m .= $d['11'];
-    $m .= $d['12'];
+  $txt = "";
 
-    $m .= "\n";
+  $txt .= "Kalender Akademik";
+  foreach ($data as $subArray) {
+    foreach ($subArray as $value) {
+      $txt .= $value . "" . PHP_EOL;
+    }
+    $txt .= "\n";
   }
-  $m .= "Informasi lebih lanjut kunjungi situs https://baak.gunadarma.ac.id/";
 
-  return $m;
+  if (empty($txt)) {
+    $txt .= "Tidak ditemukan";
+  }
+  $txt .= "Informasi lebih lanjut kunjungi situs https://baak.gunadarma.ac.id/";
+  return $txt;
 }
+
+function scrap_jadwal($param)
+{
+
+  $newparam = urlencode($param);
+
+  $url = 'https://baak.gunadarma.ac.id/jadwal/cariJadKul?teks=' . $newparam;
+
+  $html = file_get_contents($url);
+  preg_match_all('/<table[^>]*class="table table-custom table-primary table-fixed bordered-table stacktable large-only"[^>]*>(.*?)<\/table>/is', $html, $matches);
+  $table = $matches[0][0];
+  preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $table, $matches);
+  $rows = $matches[0];
+  $data = [];
+  foreach ($rows as $row) {
+    preg_match_all('/<td[^>]*>(.*?)<\/td>/is', $row, $cols);
+    $rowData = $cols[1];
+    $data[] = $rowData;
+  }
+  $txt = "";
+  foreach ($data as $subArray) {
+    foreach ($subArray as $value) {
+      $txt .= $value . "" . PHP_EOL;
+    }
+    $txt .= "\n";
+  }
+
+  if (empty($txt)) {
+    $txt .= "Tidak ada dalam database untuk kategori kelas / dosen";
+  }
+  $txt .= "Informasi lebih lanjut kunjungi situs https://baak.gunadarma.ac.id/";
+  return $txt;
+}
+
+
+
+
+
+
+
+
+
+
 function selectAll()
 {
   global $conn;
@@ -218,209 +263,3 @@ function reply($data)
 }
 
 // http_request($apiURL . "/sendMessage?$queries");
-
-$bot1 = function () {
-  global $pattern, $message, $jumlah, $update;
-  if ($jumlah != 1) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah " . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/start")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => "Selamat datang " . $update["message"]['chat']["username"] . "\n" . "Ketik /help untuk melihat perintah",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-$bot2 = function () {
-  global $pattern, $message, $jumlah, $update;
-
-  if ($jumlah != 1) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/help")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => "Daftar perintah 
-      \n1. Tambah data mahasiswa = /insert,{nama},{umur},{alamat}
-      \n2. Ubah data mahasiswa = /update,{nama},{umur},{alamat},{id}
-      \n3. Hapus data mahasiswa = /delete,{id}
-      \n4. Tampil semua data pelanggan = /select-all
-      \n5. Cari mahasiswa berdasarkan id = /select,{id}
-      \nGunakan perintah tanpa tanda kurung kurawal",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-
-$bot3 = function () {
-  global $pattern, $message, $jumlah, $update, $n, $u, $a;
-
-  if ($jumlah != 4) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/insert")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => tambah($n, $u, $a),
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-$bot4 = function () {
-  global $pattern, $message, $jumlah, $update, $n, $u, $a, $i;
-
-  if ($jumlah != 5) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/update")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => ubah($n, $u, $a, $i),
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-
-$bot5 = function () {
-  global $pattern, $message, $jumlah, $update, $id;
-
-  if ($jumlah != 2) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/cari")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => cari($id),
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-$bot6 = function () {
-  global $pattern, $message, $jumlah, $update;
-
-  if ($jumlah != 1) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/select-all")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => selectAll(),
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-$bot7 = function () {
-  global $pattern, $message, $jumlah, $update, $id;
-
-  if ($jumlah != 2) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/delete")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => hapus($id),
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-$bot8 = function () {
-  global $pattern, $message, $jumlah, $update, $id;
-
-  if ($jumlah != 1) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/scrap-baak")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => scrapBAAK(),
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};
-
-
-$bot9 = function () {
-  global $pattern, $message, $jumlah, $update, $namaFile;
-
-  if ($jumlah != 2) {
-    reply(array(
-      'chat_id' => $update["message"]["chat"]["id"],
-      'text' => "Maaf perintah" . $message . "\ntidak ada",
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-
-  if (false !== strpos($pattern, "/laporan")) {
-    reply(array(
-      'chat_id' =>  $update["message"]["chat"]["id"],
-      'text' => "Tekan link di bawah\n" . getLink($namaFile),
-      'parse_mode' => 'HTML'
-    ));
-    exit();
-  }
-};

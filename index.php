@@ -1,6 +1,10 @@
 <?php
-
+error_reporting(0);
+header('Content-Type: application/json; charset=utf-8');
 require 'function.php';
+
+
+
 $pattern = $str_arr[0];
 $n = $str_arr[1];
 $u = $str_arr[2];
@@ -9,28 +13,154 @@ $i = $str_arr[4];
 $id = $str_arr[1];
 $namaFile = $str_arr[1];
 
-
-
-
-
 if ($pattern == '/start') {
-  $bot1();
+  if ($jumlah != 1) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => "Selamat datang " . $username . "\n" . "Ketik /help untuk melihat perintah",
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/help') {
-  $bot2();
+  if ($jumlah != 1) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => "Daftar perintah 
+      \n1. Tambah data mahasiswa = /insert,{nama},{umur},{alamat}
+      \n2. Ubah data mahasiswa = /update,{nama},{umur},{alamat},{id}
+      \n3. Hapus data mahasiswa = /delete,{id}
+      \n4. Tampil semua data pelanggan = /select-all
+      \n5. Cari mahasiswa berdasarkan id = /select,{id}
+      \n6. Laporan = /laporan,{nama file tanpa extension}
+      \n6. Jadwal dari BAAK Gunadarma = /scrap-baak
+      \nGunakan perintah tanpa tanda kurung kurawal",
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/insert') {
-  $bot3();
+  if ($jumlah != 4) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => tambah($n, $u, $a),
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/update') {
-  $bot4();
+  if ($jumlah != 5) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => ubah($n, $u, $a, $i),
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/cari') {
-  $bot5();
+  if ($jumlah != 2) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => cari($id),
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/select-all') {
-  $bot6();
+  if ($jumlah != 1) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => selectAll(),
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/delete') {
-  $bot7();
+  if ($jumlah != 2) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => hapus($id),
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/scrap-baak') {
-  $bot8();
+  if ($jumlah != 1) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => scrap_baak(),
+    'parse_mode' => 'HTML'
+  ));
+} elseif ($pattern == '/scrap-jadwal') {
+  if ($jumlah != 2) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => scrap_jadwal($n),
+    'parse_mode' => 'HTML'
+  ));
 } elseif ($pattern == '/laporan') {
-  $bot9();
+  if ($jumlah != 2) {
+    reply(array(
+      'chat_id' => $chat_id,
+      'text' => "Maaf perintah " . $message . "\ntidak ada",
+      'parse_mode' => 'HTML'
+    ));
+    exit();
+  }
+  reply(array(
+    'chat_id' =>  $chat_id,
+    'text' => "Tekan link di bawah\n" . getLink($namaFile),
+    'parse_mode' => 'HTML'
+  ));
 } else {
   reply(array(
     'chat_id' => $update["message"]["chat"]["id"],
@@ -38,29 +168,3 @@ if ($pattern == '/start') {
     'parse_mode' => 'HTML'
   ));
 }
-
-
-
-
-
-
-
-
-
-// $bot1("/help", array(
-//   'chat_id' => $update["message"]["chat"]["id"],
-//   'text' => "Daftar perintah 
-//     \n1. Tambah data mahasiswa = /insert,{nama},{umur},{alamat}
-//     \n2. Ubah data mahasiswa = /update,{id},{nama},{umur},{alamat}
-//     \n3. Hapus data mahasiswa = /delete,{id}
-//     \n4. Tampil semua data pelanggan = /select-all
-//     \n5. Cari mahasiswa berdasarkan id = /select,{id}",
-//   'parse_mode' => 'HTML'
-// ), 1);
-
-
-// $bot1("/insert", array(
-//   'chat_id' =>  $update["message"]["chat"]["id"],
-//   'text' => tambah($n, $u, $a),
-//   'parse_mode' => 'HTML'
-// ), 4);
