@@ -1,6 +1,6 @@
 <?php
 error_reporting(0);
-header('Content-Type: application/json; charset=utf-8');
+
 require 'function.php';
 
 
@@ -42,8 +42,8 @@ if ($pattern == '/start') {
       \n1. Tambah data mahasiswa = /insert,{nama},{umur},{alamat}
       \n2. Ubah data mahasiswa = /update,{nama},{umur},{alamat},{id}
       \n3. Hapus data mahasiswa = /delete,{id}
-      \n4. Tampil semua data pelanggan = /select-all
-      \n5. Cari mahasiswa berdasarkan id = /select,{id}
+      \n4. Tampil semua data mahasiswa = /select-all
+      \n5. Cari mahasiswa berdasarkan id = /cari,{id}
       \n6. Laporan = /laporan,{nama file tanpa extension}
       \n7. Kalender Akademik Gunadarma = /scrap-baak
       \n8. Jadwal Perkuliahan Gunadarma = /scrap-jadwal,{kelas atau dosen}

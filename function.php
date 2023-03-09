@@ -1,5 +1,5 @@
 <?php
-define("TOKEN", "5831470744:AAE5GC1KAxGSp5SjYtXZCvih6L7QxeUWOs0");
+define("TOKEN", "5831470744:AAEiRLM0Rk5LTHQSaZ-n2oGeWlJcdlW_fmY");
 
 require_once('tcpdf/tcpdf.php');
 $apiURL = "https://api.telegram.org/bot" . TOKEN;
@@ -64,7 +64,7 @@ function getLink($nama)
   $html .= '</table>';
   $pdf->writeHTML($html, true, false, false, false, '');
   $pdf->Output(__DIR__  . '/upload/' . $nama . '.pdf', 'F');
-  $link  = "https://167c-36-70-176-201.ap.ngrok.io/telebot/upload/" . $nama . ".pdf";
+  $link  = "https://33a1-36-83-205-139.ap.ngrok.io/telebot/upload/" . $nama . ".pdf";
   //url saat ini
   return $link;
 }
